@@ -1,11 +1,9 @@
-// File Name: SignUp.js
-
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/signup.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
-import api from "../../api/api";
+import api from "../../api/api"; // Ensure this is correctly configured
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -14,8 +12,8 @@ const SignUp = () => {
     username: "",
     email: "",
     password: "",
-    role: "Parent",
-    team: "ABY", // Default team
+    role: "",
+    team: "", // Default team
   });
 
   const [errors, setErrors] = useState("");
@@ -27,16 +25,23 @@ const SignUp = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
+  const handleRoleSelection = (selectedRole) => {
+    setFormData((prev) => ({ ...prev, role: selectedRole }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setErrors("");
 
+    console.log("Submitting form data:", formData);
+
     try {
-      const res = await api.post("/auth/signup", formData);
-      alert("Sign-up successful! Proceeding to profile setup...");
-      navigate("/profile-setup");
+      await api.post("/Auth/register", formData);
+      alert("Sign-up successful! Please sign in to continue.");
+      navigate("/signin");
     } catch (err) {
+      console.error("Error during sign-up:", err);
       setErrors(err.response?.data?.message || "Something went wrong.");
     } finally {
       setLoading(false);
@@ -87,6 +92,40 @@ const SignUp = () => {
             <FontAwesomeIcon icon={showPassword ? faEye : faEyeSlash} />
           </span>
         </div>
+
+        <div>
+          <p>Select Role:</p>
+          <button
+            type="button"
+            className={`role-btn ${formData.role === 'Parent' ? 'selected' : ''}`}
+            onClick={() => handleRoleSelection('Parent')}
+          >
+            Parent
+          </button>
+          <button
+            type="button"
+            className={`role-btn ${formData.role === 'Child' ? 'selected' : ''}`}
+            onClick={() => handleRoleSelection('Child')}
+          >
+            Child
+          </button>
+        </div>
+
+        {formData.role === 'Parent' && (
+          <div>
+            <label>
+              Team Name:
+              <input
+                type="text"
+                name="team"
+                value={formData.team}
+                onChange={handleInputChange}
+                placeholder="Enter your team name"
+              />
+            </label>
+          </div>
+        )}
+
         <button type="submit" disabled={loading}>
           {loading ? "Processing..." : "Sign Up"}
         </button>

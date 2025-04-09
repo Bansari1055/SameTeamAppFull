@@ -30,8 +30,10 @@ namespace SameTeamAPI.Controllers
             if (user == null)
                 return Unauthorized("User not found");
 
-            // ⚠️ TEMPORARY: Plain-text comparison for testing
-            if (user.PasswordHash != login.Password)
+            var passwordHasher = new PasswordHasher<User>();
+            var passwordVerificationResult = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, login.Password);
+
+            if (passwordVerificationResult != PasswordVerificationResult.Success)
                 return Unauthorized("Invalid password");
 
             var token = GenerateJwtToken(user);
@@ -51,7 +53,6 @@ namespace SameTeamAPI.Controllers
             });
         }
 
-
         [HttpPost("register")]
         public IActionResult Register([FromBody] RegisterModel model)
         {
@@ -60,7 +61,8 @@ namespace SameTeamAPI.Controllers
                 return Conflict("Email already exists.");
             }
 
-            var hashedPassword = new PasswordHasher<User>().HashPassword(null, model.Password);
+            var passwordHasher = new PasswordHasher<User>();
+            var hashedPassword = passwordHasher.HashPassword(null, model.Password);
 
             var user = new User
             {

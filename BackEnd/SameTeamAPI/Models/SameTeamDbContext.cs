@@ -29,13 +29,13 @@ public partial class SameTeamDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=localhost;Database=SameTeamDB;Trusted_Connection=True;Encrypt=False;");
+        => optionsBuilder.UseSqlServer("Server=localhost\\SQLEXPRESS;Database=SameTeamDB;Trusted_Connection=True;Encrypt=False;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Chore>(entity =>
         {
-            entity.HasKey(e => e.ChoreId).HasName("PK__Chores__F0F94F540DC61504");
+            entity.HasKey(e => e.ChoreId).HasName("PK__Chores__F0F94F548A96563E");
 
             entity.Property(e => e.ChoreId).HasColumnName("ChoreID");
             entity.Property(e => e.ChoreText).HasMaxLength(255);
@@ -49,7 +49,7 @@ public partial class SameTeamDbContext : DbContext
 
         modelBuilder.Entity<CompletedChore>(entity =>
         {
-            entity.HasKey(e => e.CompletedId).HasName("PK__Complete__48D815988B860573");
+            entity.HasKey(e => e.CompletedId).HasName("PK__Complete__48D81598B75BE61F");
 
             entity.Property(e => e.CompletedId).HasColumnName("CompletedID");
             entity.Property(e => e.ChoreId).HasColumnName("ChoreID");
@@ -69,7 +69,7 @@ public partial class SameTeamDbContext : DbContext
 
         modelBuilder.Entity<RedeemedReward>(entity =>
         {
-            entity.HasKey(e => e.RedemptionId).HasName("PK__Redeemed__410680D1CC13494D");
+            entity.HasKey(e => e.RedemptionId).HasName("PK__Redeemed__410680D1ADFFC545");
 
             entity.Property(e => e.RedemptionId).HasColumnName("RedemptionID");
             entity.Property(e => e.DateRedeemed)
@@ -89,7 +89,7 @@ public partial class SameTeamDbContext : DbContext
 
         modelBuilder.Entity<Reward>(entity =>
         {
-            entity.HasKey(e => e.RewardId).HasName("PK__Rewards__8250159913F4221E");
+            entity.HasKey(e => e.RewardId).HasName("PK__Rewards__82501599A6A0D1A8");
 
             entity.Property(e => e.RewardId).HasColumnName("RewardID");
             entity.Property(e => e.Name).HasMaxLength(100);
@@ -97,9 +97,9 @@ public partial class SameTeamDbContext : DbContext
 
         modelBuilder.Entity<Team>(entity =>
         {
-            entity.HasKey(e => e.TeamId).HasName("PK__Teams__123AE7B91EC4E15B");
+            entity.HasKey(e => e.TeamId).HasName("PK__Teams__123AE7B99E79EDD5");
 
-            entity.HasIndex(e => e.TeamName, "UQ__Teams__4E21CAACC3342597").IsUnique();
+            entity.HasIndex(e => e.TeamName, "UQ__Teams__4E21CAAC137E6F3A").IsUnique();
 
             entity.Property(e => e.TeamId).HasColumnName("TeamID");
             entity.Property(e => e.TeamName).HasMaxLength(100);
@@ -107,9 +107,9 @@ public partial class SameTeamDbContext : DbContext
 
         modelBuilder.Entity<User>(entity =>
         {
-            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCAC40DD04BA");
+            entity.HasKey(e => e.UserId).HasName("PK__Users__1788CCAC3A4C17A8");
 
-            entity.HasIndex(e => e.Email, "UQ__Users__A9D105344FA41F01").IsUnique();
+            entity.HasIndex(e => e.Email, "UQ__Users__A9D10534CF148347").IsUnique();
 
             entity.Property(e => e.UserId).HasColumnName("UserID");
             entity.Property(e => e.Email).HasMaxLength(100);

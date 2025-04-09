@@ -1,15 +1,8 @@
-// File Name: App.js
-
-// CIS435 Class Project - SameTeamAppFull
-// Team:  Bob Nie, Bansari Patel
-// Date: 2025-04-03
-
 import './App.css';
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import SignUp from './components/pages/SignUp';
 import SignIn from './components/pages/SignIn';
-import ProfileSetup from './components/pages/ProfileSetup';
 import ParentDashboard from './components/pages/ParentDashboard';
 import ChildDashboard from './components/pages/ChildDashboard';
 import ChildRewards from './components/pages/ChildRewards';
@@ -27,7 +20,12 @@ function App() {
   useEffect(() => {
     const storedUser = localStorage.getItem("loggedInUser");
     if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser));
+      try {
+        setCurrentUser(JSON.parse(storedUser));
+      } catch (err) {
+        console.error("Invalid JSON in loggedInUser:", err);
+        localStorage.removeItem("loggedInUser");
+      }
     }
 
     const storedDarkMode = localStorage.getItem("darkMode") === "true";
@@ -51,11 +49,13 @@ function App() {
     useEffect(() => {
       const storedUser = localStorage.getItem("loggedInUser");
       if (storedUser && location.pathname === "/") {
-        const user = JSON.parse(storedUser);
-        if (user.role === "Parent") {
-          navigate("/parent-dashboard");
-        } else {
-          navigate("/child-dashboard");
+        try {
+          const user = JSON.parse(storedUser);
+          navigate(user.role === "Parent" ? "/parent-dashboard" : "/child-dashboard");
+        } catch (err) {
+          console.error("Failed to parse stored user:", err);
+          localStorage.removeItem("loggedInUser");
+          navigate("/signin");
         }
       }
     }, [navigate, location.pathname]);
@@ -68,12 +68,9 @@ function App() {
 
       try {
         const response = await loginUser(email, password);
-
         const { token, user } = response;
-        if (token) {
-          localStorage.setItem("token", token);
-        }
 
+        if (token) localStorage.setItem("token", token);
         if (user) {
           localStorage.setItem("loggedInUser", JSON.stringify(user));
           setCurrentUser(user);
@@ -85,7 +82,7 @@ function App() {
       }
     };
 
-    const hideNavBarRoutes = ["/", "/signin", "/signup", "/profile-setup"];
+    const hideNavBarRoutes = ["/", "/signin", "/signup"];
 
     return (
       <div className="flex">
@@ -98,7 +95,6 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/signin" element={<SignIn onSignInSuccess={handleSignInSuccess} />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/profile-setup" element={<ProfileSetup />} />
             <Route path="/parent-dashboard" element={<ParentDashboard />} />
             <Route path="/child-dashboard" element={<ChildDashboard />} />
             <Route path="/child-rewards" element={<ChildRewards />} />
